@@ -1,32 +1,29 @@
 const express = require("express");
 const dotenv = require("dotenv");
 const cors = require("cors");
-const connectDB = require("./config/db");
 const mongoose = require('mongoose');
 
 const classRoutes = require('./routes/classRoutes');
-const locationRoutes = require("./routes/location");
+const locationRoutes = require("./routes/locationRoutes"); // ✅ only one
+const authRoutes = require("./routes/authRoutes");
+const connectDB = require("./config/db");
 
-mongoose.connect('mongodb://localhost:27017/attendanceDB');
-
-mongoose.connect('mongodb://localhost:27017/classroom', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
-
-dotenv.config();
-connectDB();
+dotenv.config(); // Load environment variables first
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-app.use("/api/auth", require("./routes/authRoutes"));
-app.use("/api/location", require("./routes/locationRoutes"));
+// Connect to DB using your function
+connectDB(); // ✅ Proper way using config/db.js
 
-app.use('/api/class', classRoutes);
-
+// Routes
+app.use("/api/auth", authRoutes);
 app.use("/api/location", locationRoutes);
-app.listen(process.env.PORT, () => {
-  console.log(`Server running on port ${process.env.PORT}`);
+app.use("/api/class", classRoutes);
+
+// Start server
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`✅ Server running on port ${PORT}`);
 });

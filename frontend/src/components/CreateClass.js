@@ -5,8 +5,9 @@ const CreateClass = () => {
   const [classes, setClasses] = useState([]);
 
   const handleCreate = () => {
-    if (className.trim()) {
-      setClasses([...classes, className]);
+    const trimmed = className.trim();
+    if (trimmed && !classes.includes(trimmed)) {
+      setClasses([...classes, trimmed]);
       setClassName("");
     }
   };
@@ -19,6 +20,7 @@ const CreateClass = () => {
         placeholder="Enter class name"
         value={className}
         onChange={(e) => setClassName(e.target.value)}
+        onKeyDown={(e) => e.key === "Enter" && handleCreate()}
       />
       <button onClick={handleCreate}>Create</button>
       <ul>

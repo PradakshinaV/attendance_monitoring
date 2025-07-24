@@ -1,4 +1,3 @@
-// src/components/AdminDashboard.js
 import React, { useState } from "react";
 import CSVDownload from "./CSVDownload";
 import "../styles.css";
@@ -19,6 +18,10 @@ function AdminDashboard({ students, setStudents }) {
   };
 
   const handleSave = () => {
+    if (!editData.name?.trim() || !editData.id?.trim()) {
+      alert("Name and ID cannot be empty");
+      return;
+    }
     const updated = [...students];
     updated[editingIndex] = editData;
     setStudents(updated);
@@ -44,7 +47,7 @@ function AdminDashboard({ students, setStudents }) {
               <td>
                 {editingIndex === index ? (
                   <input
-                    value={editData.name}
+                    value={editData.name || ""}
                     onChange={(e) =>
                       setEditData({ ...editData, name: e.target.value })
                     }
@@ -56,7 +59,7 @@ function AdminDashboard({ students, setStudents }) {
               <td>
                 {editingIndex === index ? (
                   <input
-                    value={editData.id}
+                    value={editData.id || ""}
                     onChange={(e) =>
                       setEditData({ ...editData, id: e.target.value })
                     }

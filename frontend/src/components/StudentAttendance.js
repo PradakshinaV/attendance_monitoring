@@ -9,7 +9,9 @@ function StudentAttendance({ logs }) {
       ) : (
         <ul>
           {logs.map((log, index) => (
-            <li key={index}>{log}</li>
+            <li key={index}>
+              {log.status === "Left" ? "❌ Left" : "✅ Returned"} at {log.time}
+            </li>
           ))}
         </ul>
       )}

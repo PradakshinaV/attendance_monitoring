@@ -15,7 +15,8 @@ const StudentDashboard = () => {
     <div>
       <h2>Student Dashboard</h2>
       <p>Current Status: <span className="status">{currentStatus}</span></p>
-      <LocationTracker updateLogs={updateLogs} />
+      <LocationTracker updateLogs={updateLogs} locationPermission={true} />
+
       <StatusLog logs={logs} currentStatus={currentStatus} />
     </div>
   );

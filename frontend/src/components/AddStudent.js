@@ -1,13 +1,34 @@
-import React, { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
 
-const AddStudent = () => {
+export default function AddStudent() {
   const [studentName, setStudentName] = useState("");
-  const [students, setStudents] = useState([]);
+  const [classId, setClassId] = useState("");
+  const [classes, setClasses] = useState([]); // ✅ Default to empty array
 
-  const handleAdd = () => {
-    if (studentName.trim()) {
-      setStudents([...students, studentName]);
-      setStudentName("");
+  useEffect(() => {
+    axios.get("http://localhost:5000/api/class/all")
+      .then(res => setClasses(res.data))
+      .catch(err => {
+        console.error("Error fetching classes:", err);
+        setClasses([]); // ✅ Ensure fallback value even if error
+      });
+  }, []);
+
+  const handleAdd = async () => {
+    if (!studentName || !classId) {
+      alert("Please fill in all fields");
+      return;
+    }
+    try {
+      await axios.post("http://localhost:5000/api/class/add-student", {
+        studentName,
+        classId
+      });
+      alert("Student added");
+    } catch (err) {
+      console.error("Error adding student:", err);
+      alert("Failed to add student");
     }
   };
 
@@ -15,19 +36,20 @@ const AddStudent = () => {
     <div>
       <h3>Add Student</h3>
       <input
-        type="text"
-        placeholder="Student name"
+        placeholder="Student Name"
+        onChange={e => setStudentName(e.target.value)}
         value={studentName}
-        onChange={(e) => setStudentName(e.target.value)}
       />
-      <button onClick={handleAdd}>Add</button>
-      <ul>
-        {students.map((stu, index) => (
-          <li key={index}>{stu}</li>
+      <select
+        onChange={e => setClassId(e.target.value)}
+        value={classId}
+      >
+        <option value="">Select Class</option>
+        {classes.map(cls => (
+          <option key={cls._id} value={cls._id}>{cls.className}</option>
         ))}
-      </ul>
+      </select>
+      <button onClick={handleAdd}>Add</button>
     </div>
   );
-};
-
-export default AddStudent;
+}

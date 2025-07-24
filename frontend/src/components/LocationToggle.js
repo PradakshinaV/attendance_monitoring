@@ -1,7 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 function LocationToggle({ onPermissionChange }) {
   const [permission, setPermission] = useState(true);
+
+  // Notify parent once on mount
+  useEffect(() => {
+    onPermissionChange(permission);
+  }, []); // Only once
 
   const togglePermission = () => {
     const newPermission = !permission;
@@ -11,7 +16,7 @@ function LocationToggle({ onPermissionChange }) {
 
   return (
     <div className="location-toggle">
-      <p>Location Permission: {permission ? "Granted" : "Revoked"}</p>
+      <p>📍 Location Permission: {permission ? "✅ Granted" : "❌ Revoked"}</p>
       <button onClick={togglePermission}>
         {permission ? "Revoke Permission" : "Grant Permission"}
       </button>

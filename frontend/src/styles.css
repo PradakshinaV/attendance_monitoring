@@ -1,54 +1,33 @@
+/* General App Styling */
 .app {
-  font-family: Arial;
+  font-family: Arial, sans-serif;
   margin: 2rem;
   text-align: center;
 }
+
+.container {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+/* Dashboard Section */
+.dashboard-section {
+  margin: 20px;
+  padding: 20px;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+}
+
+/* Log Container */
 .log-container {
   background: #f0f0f0;
   padding: 1rem;
   border-radius: 8px;
   margin-top: 1rem;
 }
-ul {
-  list-style: none;
-  padding: 0;
-}
-li {
-  margin: 0.5rem 0;
-}
-.container {
-  padding: 20px;
-  font-family: Arial, sans-serif;
-}
 
-.dashboard-section {
-  margin-bottom: 40px;
-  padding: 15px;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  background-color: #f9f9f9;
-}
-.dashboard-section {
-  padding: 20px;
-  border: 2px solid #ccc;
-  margin: 20px;
-  border-radius: 8px;
-}
-
-.admin-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.admin-table th, .admin-table td {
-  border: 1px solid #ddd;
-  padding: 10px;
-  text-align: center;
-}
-
-.admin-table th {
-  background-color: #f2f2f2;
-}
+/* Attendance History */
 .attendance-history {
   margin-top: 20px;
 }
@@ -58,11 +37,49 @@ li {
   padding-left: 0;
 }
 
+.attendance-history li {
+  margin: 5px 0;
+}
+
+/* Location Toggle */
+.location-toggle {
+  margin-bottom: 1rem;
+}
+
 .location-toggle button {
   margin-top: 10px;
   padding: 6px 12px;
+  cursor: pointer;
 }
 
+/* Student List */
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+li {
+  margin: 0.5rem 0;
+}
+
+/* Admin Table */
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-table th,
+.admin-table td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: center;
+}
+
+.admin-table th {
+  background-color: #f2f2f2;
+}
+
+/* Status Text */
 .status {
   font-weight: bold;
   color: green;

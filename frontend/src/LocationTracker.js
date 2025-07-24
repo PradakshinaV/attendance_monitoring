@@ -1,14 +1,15 @@
 import React, { useState } from "react";
 
-const allowedLatitude = 12.9716;  // Replace with your classroom latitude
-const allowedLongitude = 77.5946; // Replace with your classroom longitude
-const radiusThreshold = 0.05; // approx ~50 meters
+// Replace with your classroom coordinates
+const allowedLatitude = 12.9716;
+const allowedLongitude = 77.5946;
+const radiusThreshold = 0.05; // approx 50 meters
 
 function LocationTracker({ updateLogs }) {
   const [status, setStatus] = useState("Unknown");
 
   const getDistance = (lat1, lon1, lat2, lon2) => {
-    const R = 6371; // Radius of earth in KM
+    const R = 6371; // Radius of Earth in KM
     const dLat = ((lat2 - lat1) * Math.PI) / 180;
     const dLon = ((lon2 - lon1) * Math.PI) / 180;
     const a =
@@ -40,18 +41,18 @@ function LocationTracker({ updateLogs }) {
         const logEntry = {
           status: newStatus,
           time: new Date().toLocaleTimeString(),
+          coords: { latitude, longitude },
         };
 
         setStatus(newStatus);
-        updateLogs((prevLogs) => [logEntry, ...prevLogs], newStatus);
+        updateLogs(logEntry, newStatus);
       },
-      () => setStatus("Location access denied.")
+      (err) => setStatus("Location access denied.")
     );
   };
 
   return (
     <div>
-      <h2>Student Dashboard</h2>
       <p>📍 Location Status: {status}</p>
       <button onClick={checkLocation}>Send Location Now</button>
     </div>
