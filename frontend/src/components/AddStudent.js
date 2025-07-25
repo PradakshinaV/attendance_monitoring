@@ -1,55 +1,62 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import axios from "axios";
 
-export default function AddStudent() {
-  const [studentName, setStudentName] = useState("");
+export default function AddStudent({ classes = [], onStudentAdded }) {
+  const [studentEmail, setStudentEmail] = useState(""); // ✅ Changed from studentName
   const [classId, setClassId] = useState("");
-  const [classes, setClasses] = useState([]); // ✅ Default to empty array
 
-  useEffect(() => {
-    axios.get("http://localhost:5000/api/class/all")
-      .then(res => setClasses(res.data))
-      .catch(err => {
-        console.error("Error fetching classes:", err);
-        setClasses([]); // ✅ Ensure fallback value even if error
-      });
-  }, []);
-
-  const handleAdd = async () => {
-    if (!studentName || !classId) {
-      alert("Please fill in all fields");
+  const handleAddStudent = async () => {
+    if (!studentEmail || !classId) {
+      alert("Please fill both email and select a class");
       return;
     }
+
     try {
+      const token = localStorage.getItem('token'); // ✅ Get auth token
       await axios.post("http://localhost:5000/api/class/add-student", {
-        studentName,
-        classId
+        studentEmail, // ✅ Fixed parameter name
+        classId,
+      }, {
+        headers: { Authorization: `Bearer ${token}` } // ✅ Add auth header
       });
-      alert("Student added");
+      setStudentEmail("");
+      setClassId("");
+      alert("Student added!");
+      onStudentAdded(); // Refresh class list
     } catch (err) {
-      console.error("Error adding student:", err);
-      alert("Failed to add student");
+      console.error("Failed to add student", err);
+      alert("Failed to add student: " + (err.response?.data?.msg || err.message));
     }
   };
 
   return (
-    <div>
-      <h3>Add Student</h3>
+    <div style={{ marginBottom: "20px" }}>
+      <h3>Add Student to Class</h3>
       <input
-        placeholder="Student Name"
-        onChange={e => setStudentName(e.target.value)}
-        value={studentName}
+        value={studentEmail}
+        onChange={(e) => setStudentEmail(e.target.value)}
+        placeholder="Enter student email" // ✅ Updated placeholder
+        style={{ marginRight: "10px", padding: "5px" }}
       />
-      <select
-        onChange={e => setClassId(e.target.value)}
-        value={classId}
+      <select 
+        value={classId} 
+        onChange={(e) => setClassId(e.target.value)}
+        style={{ marginRight: "10px", padding: "5px" }}
       >
         <option value="">Select Class</option>
-        {classes.map(cls => (
-          <option key={cls._id} value={cls._id}>{cls.className}</option>
-        ))}
+        {classes.length > 0 ? (
+          classes.map((cls) => (
+            <option key={cls._id} value={cls._id}>
+              {cls.className}
+            </option>
+          ))
+        ) : (
+          <option disabled>No classes available</option>
+        )}
       </select>
-      <button onClick={handleAdd}>Add</button>
+      <button onClick={handleAddStudent} style={{ padding: "6px 12px" }}>
+        ➕ Add Student
+      </button>
     </div>
   );
 }

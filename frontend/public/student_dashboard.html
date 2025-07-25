@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Student Dashboard</title>
+</head>
+<body>
+  <h1>Welcome Student</h1>
+
+  <button onclick="sendLocation()">Send Attendance Location</button>
+
+  <script>
+    function sendLocation() {
+      const token = localStorage.getItem("token"); // Get token from localStorage
+      if (!token) {
+        alert("You must log in first.");
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition((position) => {
+        fetch("http://localhost:5000/api/location/send-location", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + token
+          },
+          body: JSON.stringify({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            timestamp: new Date().toISOString()
+          })
+        })
+        .then(res => res.json())
+        .then(data => {
+          console.log(data);
+          alert(data.message || "Location sent successfully!");
+        })
+        .catch((err) => {
+          console.error(err);
+          alert("Failed to send location");
+        });
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,35 +1,32 @@
-import React, { useState } from "react";
+// CreateClass.js
+import { useState } from "react";
+import axios from "axios";
 
-const CreateClass = () => {
+export default function CreateClass({ onClassCreated }) {
   const [className, setClassName] = useState("");
-  const [classes, setClasses] = useState([]);
 
-  const handleCreate = () => {
-    const trimmed = className.trim();
-    if (trimmed && !classes.includes(trimmed)) {
-      setClasses([...classes, trimmed]);
+  const handleCreate = async () => {
+    if (!className.trim()) return;
+
+    try {
+      await axios.post("http://localhost:5000/api/class/create", {
+        className: className.trim(),
+      });
       setClassName("");
+      onClassCreated(); // refresh class list in dashboard
+    } catch (err) {
+      console.error("Failed to create class", err);
     }
   };
 
   return (
     <div>
-      <h3>Create Class</h3>
       <input
-        type="text"
-        placeholder="Enter class name"
         value={className}
         onChange={(e) => setClassName(e.target.value)}
-        onKeyDown={(e) => e.key === "Enter" && handleCreate()}
+        placeholder="Enter class name"
       />
       <button onClick={handleCreate}>Create</button>
-      <ul>
-        {classes.map((cls, index) => (
-          <li key={index}>{cls}</li>
-        ))}
-      </ul>
     </div>
   );
-};
-
-export default CreateClass;
+}

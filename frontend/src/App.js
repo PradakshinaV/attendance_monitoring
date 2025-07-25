@@ -10,6 +10,7 @@ import StudentAttendance from "./components/StudentAttendance";
 import LocationToggle from "./components/LocationToggle";
 import AdminDashboard from "./components/AdminDashboard";
 import TeacherDashboard from "./components/TeacherDashboard";
+import SendLocation from "./components/SendLocation"; // ✅ Your button
 
 import "./styles.css";
 
@@ -32,7 +33,7 @@ function App() {
       <div className="container">
         <h1>Attendance Monitoring System</h1>
 
-        {/* Navigation Menu */}
+        {/* Navigation */}
         <nav style={{ marginBottom: "20px" }}>
           <Link to="/" style={{ marginRight: "15px" }}>🏫 Home</Link>
           <Link to="/teacher" style={{ marginRight: "15px" }}>👨‍🏫 Teacher</Link>
@@ -75,6 +76,7 @@ function App() {
                   updateLogs={updateLogs}
                   locationPermission={locationPermission}
                 />
+                <SendLocation /> {/* ✅ Button to send location */}
                 <p>
                   Current Status:{" "}
                   <span className="status">{currentStatus}</span>

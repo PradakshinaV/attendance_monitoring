@@ -3,6 +3,7 @@ const dotenv = require("dotenv");
 const cors = require("cors");
 const mongoose = require('mongoose');
 
+const userRoutes = require("./routes/userRoutes");
 const classRoutes = require('./routes/classRoutes');
 const locationRoutes = require("./routes/locationRoutes"); // ✅ only one
 const authRoutes = require("./routes/authRoutes");
@@ -13,6 +14,8 @@ dotenv.config(); // Load environment variables first
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+app.use("/api/user", userRoutes); // ✅ Add user CRUD routes
 
 // Connect to DB using your function
 connectDB(); // ✅ Proper way using config/db.js

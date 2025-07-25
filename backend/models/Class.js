@@ -1,19 +1,16 @@
-const mongoose = require('mongoose');
+// models/Class.js - FIXED VERSION
+const mongoose = require("mongoose");
 
-const classSchema = new mongoose.Schema({
-  className: {
-    type: String,
-    required: true,
+const ClassSchema = new mongoose.Schema({
+  className: { type: String, required: true },
+  teacher: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }, // ✅ Fixed
+  students: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }], // ✅ Fixed
+  classLat: Number,
+  classLng: Number,
+  radiusMeters: {
+    type: Number,
+    default: 50,
   },
-  teacher: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
-  },
-  students: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User"
-  }]
 }, { timestamps: true });
 
-module.exports = mongoose.model('Class', classSchema);
+module.exports = mongoose.model("Class", ClassSchema);
