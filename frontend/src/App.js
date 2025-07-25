@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 
+import Login from "./components/Login";
 import LocationTracker from "./components/LocationTracker";
 import StatusLog from "./components/StatusLog";
 import CreateClass from "./components/CreateClass";
@@ -44,6 +45,7 @@ function App() {
         <Routes>
           <Route path="/" element={<TeacherDashboard />} />
 
+        <Route path="/login" element={<Login />} />
           <Route
             path="/admin"
             element={

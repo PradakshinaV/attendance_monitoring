@@ -23,15 +23,21 @@ function LocationTracker({ updateLogs, locationPermission }) {
           const lng = position.coords.longitude;
           const accuracy = position.coords.accuracy;
 
-          // ✅ Get token from localStorage (add proper auth later)
-          const token = localStorage.getItem('token') || 'dummy-student-token';
+          // Get token from localStorage
+          const token = localStorage.getItem('token');
+          
+          if (!token) {
+            setError('Please log in to track location');
+            setStatus('Authentication required');
+            return;
+          }
 
           // Send location to backend with enhanced data
           fetch("http://localhost:5000/api/location/send-location", {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${token}` // ✅ Proper auth header
+              Authorization: `Bearer ${token}`
             },
             body: JSON.stringify({
               latitude: lat,
@@ -40,26 +46,31 @@ function LocationTracker({ updateLogs, locationPermission }) {
               timestamp: new Date().toISOString()
             })
           })
-            .then(res => res.json())
+            .then(res => {
+              if (!res.ok) {
+                throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+              }
+              return res.json();
+            })
             .then((data) => {
               if (data.error) {
                 setError(data.error);
                 setStatus('Error: ' + data.error);
               } else {
-                // Update boundary information
+                // Update boundary information using backend response
                 setBoundaryInfo({
-                  isWithinBoundary: data.isWithinBoundary || true,
-                  distanceFromClass: data.distanceFromClass || 0,
+                  isWithinBoundary: data.isWithinBoundary || data.inRange || true,
+                  distanceFromClass: data.distanceFromClass || data.distance || 0,
                   boundaryStatus: data.boundaryStatus || 'inside',
                   outsideDuration: data.outsideDuration || 0
                 });
 
                 // Set status based on boundary status
-                let statusMessage = "Location sent";
+                let statusMessage = "Location sent successfully";
                 if (data.boundaryStatus === 'just_left') {
-                  statusMessage = "⚠️ Left classroom boundary";
+                  statusMessage = "⚠️ Just left classroom boundary";
                 } else if (data.boundaryStatus === 'outside') {
-                  statusMessage = `🚨 Outside classroom (${data.distanceFromClass}m away)`;
+                  statusMessage = `🚨 Outside classroom (${data.distanceFromClass || data.distance}m away)`;
                 } else if (data.boundaryStatus === 'long_absence') {
                   statusMessage = `🚨 ALERT: Outside for ${data.outsideDuration}+ minutes - Staff notified!`;
                 } else if (data.boundaryStatus === 'inside') {
@@ -74,30 +85,59 @@ function LocationTracker({ updateLogs, locationPermission }) {
                   updateLogs({
                     status: statusMessage,
                     time: new Date().toLocaleTimeString(),
-                    distance: data.distanceFromClass,
-                    isWithinBoundary: data.isWithinBoundary,
-                    boundaryStatus: data.boundaryStatus,
-                    outsideDuration: data.outsideDuration,
-                    alert: data.boundaryStatus === 'long_absence'
-                  }, data.boundaryStatus);
+                    distance: data.distanceFromClass || data.distance,
+                    isWithinBoundary: data.isWithinBoundary || data.inRange,
+                    boundaryStatus: data.boundaryStatus || 'inside',
+                    outsideDuration: data.outsideDuration || 0,
+                    alert: data.alertTriggered || false
+                  }, data.boundaryStatus || 'inside');
                 }
               }
             })
             .catch((err) => {
               console.error("Location send error:", err);
-              setError("Failed to send location");
-              setStatus("Connection error");
+              if (err.message.includes('401')) {
+                setError("Authentication failed - please log in again");
+                setStatus("Authentication required");
+                localStorage.removeItem('token'); // Clear invalid token
+              } else if (err.message.includes('403')) {
+                setError("Access denied - insufficient permissions");
+                setStatus("Access denied");
+              } else if (err.message.includes('404')) {
+                setError("You are not enrolled in any class");
+                setStatus("No class enrollment");
+              } else {
+                setError("Failed to send location: " + err.message);
+                setStatus("Connection error");
+              }
             });
         },
         (err) => {
           console.error("Geolocation error:", err);
-          setError("Geolocation permission denied or unavailable");
+          let errorMessage = "Location access error";
+          
+          switch(err.code) {
+            case err.PERMISSION_DENIED:
+              errorMessage = "Location permission denied by user";
+              break;
+            case err.POSITION_UNAVAILABLE:
+              errorMessage = "Location information unavailable";
+              break;
+            case err.TIMEOUT:
+              errorMessage = "Location request timed out";
+              break;
+            default:
+              errorMessage = "Unknown location error";
+              break;
+          }
+          
+          setError(errorMessage);
           setStatus("Location access denied");
         },
         {
           enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 30000 // Reduced from 60000 for more frequent updates
+          timeout: 15000, // Increased timeout
+          maximumAge: 30000
         }
       );
     };
